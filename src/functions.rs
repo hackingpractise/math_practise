@@ -11,7 +11,7 @@ pub(crate) fn cube(iterations: i32) -> io::Result<SumReults> {
     let mut score = 0_i32;
     let mut failed = vec![];
     let now = Instant::now();
-    for n in 1..iterations + 1 {
+    for n in 1..=iterations {
         let num = range.sample(&mut rng);
         println!("Find cube root of:{}", num.pow(3));
         let mut buffer = String::with_capacity(BUFFER);
@@ -31,8 +31,8 @@ pub(crate) fn cube(iterations: i32) -> io::Result<SumReults> {
             time_elapsed.as_millis() as f64 / 1000_f64
         );
     } else {
-        println!("Thanks for trying, you scored {}", score);
-        println!("You failed the following problems: {:?}", failed);
+        println!("Thanks for trying, you scored {score}");
+        println!("You failed the following problems: {failed:?}");
     }
     Ok(SumReults {
         time_taken: time_elapsed.as_nanos(),

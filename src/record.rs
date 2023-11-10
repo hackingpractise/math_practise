@@ -15,13 +15,8 @@ pub struct Record {
     pub time_taken: u128,
 }
 impl Record {
-    pub fn new(score: i32, time_taken: u128, time_recorded: u128, index: u32) -> Self {
-        Self {
-            index,
-            score,
-            time_taken,
-            time_recorded,
-        }
+    #[must_use] pub fn new(score: i32, time_taken: u128, time_recorded: u128, index: u32) -> Self {
+        Self { index, score, time_recorded, time_taken }
     }
     pub fn add(&self) -> io::Result<()> {
         // TODO
@@ -34,12 +29,12 @@ impl Record {
         } else {
             serde_json::from_str(&contents).unwrap()
         };
-        vec_records.push(self.to_owned());
+        vec_records.push(self.clone());
         let json_val: String = serde_json::to_string_pretty(&vec_records).unwrap();
         write_to_file(FILE_NAME, json_val.as_bytes()).unwrap();
         Ok(())
     }
-    pub fn last_entry() -> Option<Record> {
+    #[must_use] pub fn last_entry() -> Option<Self> {
         let list = read_from_file(FILE_NAME).unwrap();
         list.last().cloned()
     }
@@ -53,34 +48,34 @@ pub struct RecordBuilder {
 }
 
 impl RecordBuilder {
-    pub fn new() -> Self {
-        Self { ..Self::default() }
+    #[must_use] pub fn new() -> Self {
+        Self::default()
     }
-    pub fn add_index(self, index: u32) -> Self {
+    #[must_use] pub fn add_index(self, index: u32) -> Self {
         Self {
             index: Some(index),
             ..self
         }
     }
-    pub fn add_time_taken(self, time_taken: u128) -> Self {
+    #[must_use] pub fn add_time_taken(self, time_taken: u128) -> Self {
         Self {
             time_taken: Some(time_taken),
             ..self
         }
     }
-    pub fn add_time_recorded(self, time_recorded: u128) -> Self {
+    #[must_use] pub fn add_time_recorded(self, time_recorded: u128) -> Self {
         Self {
             time_recorded: Some(time_recorded),
             ..self
         }
     }
-    pub fn add_score(self, score: i32) -> Self {
+    #[must_use] pub fn add_score(self, score: i32) -> Self {
         Self {
             score: Some(score),
             ..self
         }
     }
-    pub fn build(self) -> Record {
+    #[must_use] pub fn build(self) -> Record {
         Record {
             score: self.score.unwrap(),
             time_recorded: self.time_recorded.unwrap(),
@@ -95,7 +90,7 @@ pub fn read_from_file(filename: &str) -> AResult<Vec<Record>> {
         fs::File::create(filename).unwrap();
     }
     let json: String = fs::read_to_string(filename)
-        .with_context(|| format!("Unable to read file: {}", filename))?;
+        .with_context(|| format!("Unable to read file: {filename}"))?;
     let records: Vec<Record> = serde_json::from_str(json.trim()).unwrap_or_default();
 
     Ok(records)

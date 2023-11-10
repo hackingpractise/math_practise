@@ -13,10 +13,10 @@ enum Time {
 impl std::fmt::Display for Time {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Seconds(x) => write!(f, "{} seconds", x),
-            Self::Min(x, y) => write!(f, "{} minutes and {} seconds", x, y),
-            Self::Hour(x, y) => write!(f, "{} hour(s) and {} seconds", x, y),
-            Self::Day(x, y) => write!(f, "{} day(s) and {} seconds", x, y),
+            Self::Seconds(x) => write!(f, "{x} seconds"),
+            Self::Min(x, y) => write!(f, "{x} minutes and {y} seconds"),
+            Self::Hour(x, y) => write!(f, "{x} hour(s) and {y} seconds"),
+            Self::Day(x, y) => write!(f, "{x} day(s) and {y} seconds"),
         }
     }
 }
@@ -32,9 +32,7 @@ fn main() {
 
     // Print the improvement.
     if let Some(rec) = record::Record::last_entry() {
-        if record.time_recorded < rec.time_recorded {
-            panic!("Help!Help")
-        }
+        assert!(record.time_recorded >= rec.time_recorded, "Help!Help");
         let time_since_last = record.time_recorded - rec.time_recorded;
         let duration = Duration::from_nanos(time_since_last as u64);
         let time = map_time(duration);
@@ -45,7 +43,7 @@ fn main() {
                 time
             );
         } else if rec.score == record.score {
-            println!("Congatuations you maintained your score since {} ago", time);
+            println!("Congatuations you maintained your score since {time} ago");
         } else {
             println!(
                 "Hurrah you improved by {1} since last time {0} ago",
